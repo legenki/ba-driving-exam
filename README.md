@@ -1,8 +1,8 @@
-# BA Driving Exam
+# Buenos Aires Driving Exam
 
 **[Open the app](https://legenki.github.io/ba-driving-exam/)**
 
-A handy study app built for expats, digital nomads, and immigrants in Argentina — helping you prepare for the Buenos Aires driving theory exam without needing fluent Spanish. The interface is in English by default, with a one-click switch to Russian — and all Spanish terms are annotated throughout.
+A handy study app built for expats, digital nomads, and immigrants in Argentina — helping you prepare for the Buenos Aires driving theory exam without needing fluent Spanish. The interface is in English by default, and all Spanish terms are annotated throughout.
 
 ![vanilla JS](https://img.shields.io/badge/vanilla-JS-yellow) ![license](https://img.shields.io/badge/license-MIT-blue)
 
