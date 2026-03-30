@@ -1656,20 +1656,8 @@ function buildGlossary(q) {
     if (wordHits.length >= 20) break;
   }
 
-  // ── SECTION 3: Annotate question text ───────────────────
-  // Highlight matched words in the question text display
-  let annotatedQ = esc(q.text);
-  // Sort by length desc to avoid partial replacements
-  const sortedHits = [...wordHits].sort((a,b) => b.es.length - a.es.length);
-  for (const {es, ru} of sortedHits) {
-    const re = new RegExp('(' + es.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
-    annotatedQ = annotatedQ.replace(re, `<mark class="word-mark" title="${esc(ru)}">$1</mark>`);
-  }
-  // Also highlight vocab matches
-  for (const v of vocabMatches) {
-    const re = new RegExp('(' + v.es.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
-    annotatedQ = annotatedQ.replace(re, `<mark class="word-mark vocab-mark" title="${esc(lang==='en'?(v.en||v.ru):v.ru)}">$1</mark>`);
-  }
+  // ── SECTION 3: Question text (no word highlighting) ─────
+  const annotatedQ = esc(q.text);
 
   if (vocabMatches.length === 0 && wordHits.length === 0) return '';
 
