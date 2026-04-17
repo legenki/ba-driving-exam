@@ -107,9 +107,9 @@ function renderStats() {
   if (recentSessions.length > 0) {
     const W = 280, H = 80, barW = 28, gap = (W - recentSessions.length * barW) / (recentSessions.length + 1);
     const days = lang === 'ru' ? ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor = isDark ? '#a8a8a8' : '#9c9890';
-    const labelColor = isDark ? '#8a8a8a' : '#6b6963';
+    const cs = getComputedStyle(document.documentElement);
+    const textColor = cs.getPropertyValue('--chart-text').trim();
+    const labelColor = cs.getPropertyValue('--chart-label').trim();
     let bars = '';
     recentSessions.forEach((sess, i) => {
       const rate = sess.total > 0 ? sess.correct / sess.total : 0;
@@ -162,35 +162,44 @@ function renderStats() {
 
 
 // ─── INFO ─────────────────────────────────────────────
+function createSettingsCard(icon, titleEN, titleRU, label, buttons) {
+  const isEN = lang === 'en';
+  const title = isEN ? titleEN : titleRU;
+  const btnHtml = buttons.map(btn =>
+    `<button class="lang-btn${btn.active ? ' lang-active' : ''}" data-action="${btn.action}" ${btn.attr}>${btn.label}</button>`
+  ).join('');
+  return `<div class="info-card" style="margin-bottom:14px">
+    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
+      <span class="info-icon">${icon}</span>
+      <h2>${title}</h2>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span style="font-size:14px;color:var(--muted)">${label}</span>
+      <div style="display:flex;gap:6px">${btnHtml}</div>
+    </div>
+  </div>`;
+}
+
 function renderInfo() {
   const isEN = lang === 'en';
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const langCard = `<div class="info-card" style="margin-bottom:14px">
-    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
-      <span class="info-icon">🌐</span>
-      <h2>${isEN ? 'Language' : 'Язык'}</h2>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <span style="font-size:14px;color:var(--muted)">${isEN ? 'Switch interface language:' : 'Переключить язык интерфейса:'}</span>
-      <div style="display:flex;gap:6px">
-        <button class="lang-btn${isEN?' lang-active':''}" data-action="toggleLang" id="lang-btn-en" data-lang="en">EN</button>
-        <button class="lang-btn${!isEN?' lang-active':''}" data-action="toggleLang" id="lang-btn-ru" data-lang="ru">RU</button>
-      </div>
-    </div>
-  </div>`;
-  const themeCard = `<div class="info-card" style="margin-bottom:14px">
-    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
-      <span class="info-icon">🎨</span>
-      <h2>${isEN ? 'Theme' : 'Тема'}</h2>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <span style="font-size:14px;color:var(--muted)">${isEN ? 'Dark theme:' : 'Темная тема:'}</span>
-      <div style="display:flex;gap:6px">
-        <button class="lang-btn${!isDark?' lang-active':''}" data-action="toggleTheme" data-theme="light">☀️ ${isEN ? 'Light' : 'Светлая'}</button>
-        <button class="lang-btn${isDark?' lang-active':''}" data-action="toggleTheme" data-theme="dark">🌙 ${isEN ? 'Dark' : 'Темная'}</button>
-      </div>
-    </div>
-  </div>`;
+
+  const langCard = createSettingsCard('🌐', 'Language', 'Язык',
+    isEN ? 'Switch interface language:' : 'Переключить язык интерфейса:',
+    [
+      { label: 'EN', action: 'toggleLang', attr: 'data-lang="en"', active: isEN },
+      { label: 'RU', action: 'toggleLang', attr: 'data-lang="ru"', active: !isEN }
+    ]
+  );
+
+  const themeCard = createSettingsCard('🎨', 'Theme', 'Тема',
+    isEN ? 'Dark theme:' : 'Темная тема:',
+    [
+      { label: `☀️ ${isEN ? 'Light' : 'Светлая'}`, action: 'toggleTheme', attr: 'data-theme="light"', active: !isDark },
+      { label: `🌙 ${isEN ? 'Dark' : 'Темная'}`, action: 'toggleTheme', attr: 'data-theme="dark"', active: isDark }
+    ]
+  );
+
   const html = INFO_HTML[lang];
   const secondCard = html.indexOf('<div class="info-card">', html.indexOf('<div class="info-card">') + 1);
   const infoHtml = secondCard === -1 ? html + langCard + themeCard : html.slice(0, secondCard) + langCard + themeCard + html.slice(secondCard);

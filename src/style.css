@@ -21,6 +21,10 @@
   --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
   --font:'Inter',-apple-system,sans-serif;
 }
+:root{
+  --chart-text:#9c9890;
+  --chart-label:#6b6963;
+}
 [data-theme="dark"]{
   --bg:#121212;
   --surface:#1e1e1e;
@@ -39,6 +43,8 @@
   --blue:#2563eb;
   --blue-lt:#1f3d5c;
   --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.2);
+  --chart-text:#a8a8a8;
+  --chart-label:#8a8a8a;
 }
 html{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-y:scroll}
 body{min-height:100vh;width:100%}
