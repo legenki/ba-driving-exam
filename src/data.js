@@ -122,6 +122,23 @@ function catLabel(cat) {
   return (lang === 'ru' ? CAT_LABELS : CAT_LABELS_EN)[cat] || cat;
 }
 
+// ─── THEME ────────────────────────────────────────────
+function setTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('pddar_theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('pddar_theme', 'light');
+  }
+}
+function loadTheme() {
+  const saved = localStorage.getItem('pddar_theme') || 'light';
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+}
+
 // ─── INFO HTML ────────────────────────────────────────
 const INFO_HTML = {
   en: `

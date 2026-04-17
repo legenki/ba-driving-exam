@@ -107,6 +107,9 @@ function renderStats() {
   if (recentSessions.length > 0) {
     const W = 280, H = 80, barW = 28, gap = (W - recentSessions.length * barW) / (recentSessions.length + 1);
     const days = lang === 'ru' ? ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#a8a8a8' : '#9c9890';
+    const labelColor = isDark ? '#8a8a8a' : '#6b6963';
     let bars = '';
     recentSessions.forEach((sess, i) => {
       const rate = sess.total > 0 ? sess.correct / sess.total : 0;
@@ -117,8 +120,8 @@ function renderStats() {
       const d = new Date(sess.date + 'T12:00:00');
       const dayLabel = days[d.getDay()] || sess.date.slice(5);
       bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="4" fill="${fill}" opacity=".85"/>`;
-      bars += `<text x="${x+barW/2}" y="78" text-anchor="middle" font-size="9" fill="#9c9890">${dayLabel}</text>`;
-      bars += `<text x="${x+barW/2}" y="${y-3}" text-anchor="middle" font-size="9" fill="#6b6963">${Math.round(rate*100)}%</text>`;
+      bars += `<text x="${x+barW/2}" y="78" text-anchor="middle" font-size="9" fill="${textColor}">${dayLabel}</text>`;
+      bars += `<text x="${x+barW/2}" y="${y-3}" text-anchor="middle" font-size="9" fill="${labelColor}">${Math.round(rate*100)}%</text>`;
     });
     chartHtml = `<div class="chart-wrap">
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px">
@@ -161,6 +164,7 @@ function renderStats() {
 // ─── INFO ─────────────────────────────────────────────
 function renderInfo() {
   const isEN = lang === 'en';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const langCard = `<div class="info-card" style="margin-bottom:14px">
     <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
       <span class="info-icon">🌐</span>
@@ -174,9 +178,22 @@ function renderInfo() {
       </div>
     </div>
   </div>`;
+  const themeCard = `<div class="info-card" style="margin-bottom:14px">
+    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
+      <span class="info-icon">🎨</span>
+      <h2>${isEN ? 'Theme' : 'Тема'}</h2>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span style="font-size:14px;color:var(--muted)">${isEN ? 'Dark theme:' : 'Темная тема:'}</span>
+      <div style="display:flex;gap:6px">
+        <button class="lang-btn${!isDark?' lang-active':''}" data-action="toggleTheme" data-theme="light">☀️ ${isEN ? 'Light' : 'Светлая'}</button>
+        <button class="lang-btn${isDark?' lang-active':''}" data-action="toggleTheme" data-theme="dark">🌙 ${isEN ? 'Dark' : 'Темная'}</button>
+      </div>
+    </div>
+  </div>`;
   const html = INFO_HTML[lang];
   const secondCard = html.indexOf('<div class="info-card">', html.indexOf('<div class="info-card">') + 1);
-  const infoHtml = secondCard === -1 ? html + langCard : html.slice(0, secondCard) + langCard + html.slice(secondCard);
+  const infoHtml = secondCard === -1 ? html + langCard + themeCard : html.slice(0, secondCard) + langCard + themeCard + html.slice(secondCard);
   document.getElementById('info-content').innerHTML = infoHtml;
 }
 
@@ -241,6 +258,11 @@ document.addEventListener('click', e => {
     renderStats();
     return;
   }
+  if (action === 'toggleTheme') {
+    setTheme(el.dataset.theme);
+    renderInfo();
+    return;
+  }
   if (action === 'resetconfirm') {
     if (confirm(t('statsResetConfirm'))) {
       resetState();
@@ -277,6 +299,7 @@ document.addEventListener('mouseout', e => {
 });
 
 // ─── INIT ─────────────────────────────────────────────
+loadTheme();
 loadState();
 applyLang();
 startSession();
