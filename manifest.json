@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Buenos Aires Driving Theory Exam Trainer",
+  "version": "1.0.0",
+  "description": "Study app for the Buenos Aires driving theory exam — quiz, dictionary, statistics, and a license guide for expats.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open Buenos Aires Driving Exam"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["sidePanel"]
+}

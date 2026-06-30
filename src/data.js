@@ -971,7 +971,7 @@ function renderQuestion() {
 
   let imgHtml = '';
   if (q.img) {
-    imgHtml = `<img class="question-img" src="${q.img}" alt="Вопрос" loading="lazy" onerror="this.style.display='none'">`;
+    imgHtml = `<img class="question-img" src="${q.img}" alt="Вопрос" loading="lazy">`;
   }
 
   let optsHtml = '';
@@ -1015,6 +1015,12 @@ function renderQuestion() {
       <div class="qsearch-results" id="qsearch-results"></div>
     </div>
   `;
+
+  // Hide the question image if it fails to load (CSP-safe; replaces inline onerror)
+  const qImg = document.querySelector('#quiz-content .question-img');
+  if (qImg) {
+    qImg.addEventListener('error', function() { this.style.display = 'none'; });
+  }
 
   // Attach search handler after DOM insert
   const inp = document.getElementById('qsearch-input');

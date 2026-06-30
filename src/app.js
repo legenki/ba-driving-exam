@@ -1,4 +1,26 @@
 (function(){
+// ─── DONATE ──────────────────────────────────────────
+// Replace with your Stripe Payment Link (Dashboard → Payment links → New).
+// Used by both the header button and the Info-tab card. Edit here only.
+const DONATE_URL = 'https://buy.stripe.com/aFa3cw28Vdbr4Pag4G1Nu00';
+
+function donateCard() {
+  const isEN = lang === 'en';
+  const title = isEN ? 'Support this project' : 'Поддержать проект';
+  const text = isEN
+    ? 'This app is free and open source, with no ads or tracking. If it helps you pass, a small one-time tip keeps it maintained and the questions up to date.'
+    : 'Приложение бесплатное и с открытым кодом — без рекламы и слежки. Если оно помогло вам сдать, небольшой разовый донат поможет поддерживать его и обновлять вопросы.';
+  const btn = isEN ? '☕ Donate $6' : '☕ Поддержать на $6';
+  return `<div class="info-card donate-card" style="margin-bottom:14px">
+    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
+      <span class="info-icon">❤️</span>
+      <h2>${title}</h2>
+    </div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:12px">${text}</p>
+    <a class="donate-btn" href="${DONATE_URL}" target="_blank" rel="noopener noreferrer">${btn}</a>
+  </div>`;
+}
+
 function renderVocab() {
   // Filters — use CAT_ORDER to control pill order
   const usedCats = CAT_ORDER.filter(c => ALL_VOCAB.some(v => v.cat === c));
@@ -200,9 +222,10 @@ function renderInfo() {
     ]
   );
 
+  const settingsCards = langCard + themeCard + donateCard();
   const html = INFO_HTML[lang];
   const secondCard = html.indexOf('<div class="info-card">', html.indexOf('<div class="info-card">') + 1);
-  const infoHtml = secondCard === -1 ? html + langCard + themeCard : html.slice(0, secondCard) + langCard + themeCard + html.slice(secondCard);
+  const infoHtml = secondCard === -1 ? html + settingsCards : html.slice(0, secondCard) + settingsCards + html.slice(secondCard);
   document.getElementById('info-content').innerHTML = infoHtml;
 }
 
@@ -308,6 +331,8 @@ document.addEventListener('mouseout', e => {
 });
 
 // ─── INIT ─────────────────────────────────────────────
+const donateLink = document.getElementById('donate-link');
+if (donateLink) donateLink.href = DONATE_URL;
 loadTheme();
 loadState();
 applyLang();
