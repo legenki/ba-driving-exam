@@ -1,0 +1,5 @@
+# Build artifacts (Chrome Web Store package)
+*.zip
+
+# macOS
+.DS_Store
