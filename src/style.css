@@ -1,3 +1,10 @@
+@font-face{
+  font-family:'Inter';
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+  src:url('../fonts/inter.woff2') format('woff2');
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f9f9f8;
@@ -79,6 +86,7 @@ body{min-height:100vh;width:100%}
   color:var(--muted);transition:all .15s;
 }
 .nav-btn:hover{background:var(--surface3);color:var(--text)}
+.nav-icon{display:inline-flex;align-items:center;justify-content:center;padding:6px 9px}
 .nav-btn.active{background:var(--text);color:#fff}
 [data-theme="dark"] .nav-btn{color:var(--muted)}
 [data-theme="dark"] .nav-btn:hover{background:var(--surface2);color:var(--text)}
@@ -93,6 +101,23 @@ body{min-height:100vh;width:100%}
 }
 .lang-btn:hover{border-color:var(--accent);color:var(--accent)}
 .lang-btn.lang-active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* DONATE */
+.donate-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;margin-left:4px;border-radius:50%;
+  color:var(--muted);flex-shrink:0;transition:all .15s;
+}
+.donate-icon:hover{background:var(--surface3);color:var(--red)}
+[data-theme="dark"] .donate-icon:hover{background:var(--surface2)}
+.donate-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;border-radius:20px;text-decoration:none;
+  background:var(--accent);color:#fff;
+  font-family:var(--font);font-size:14px;font-weight:600;
+  transition:filter .15s;
+}
+.donate-btn:hover{filter:brightness(1.08)}
 
 /* LAYOUT */
 .wrap{max-width:680px;margin:0 auto;padding:20px 16px 60px}
@@ -286,25 +311,10 @@ body{min-height:100vh;width:100%}
 .alphabet-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5}
 
 /* QUESTION SEARCH */
-.qsearch-card{
-  background:var(--surface);border-radius:var(--r);padding:12px 14px;
-  margin-top:10px;border:1px solid var(--border);
-}
-.qsearch-header{
-  display:flex;align-items:center;gap:6px;
-  font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);
-  margin-bottom:10px;
-}
-.qsearch-input{
-  width:100%;box-sizing:border-box;
-  padding:8px 12px;border-radius:8px;
-  border:1.5px solid var(--border);background:var(--bg);
-  font-size:14px;color:var(--text);outline:none;
-}
-.qsearch-input:focus{border-color:var(--accent);}
-.qsearch-results{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+.qsearch-results{display:flex;flex-direction:column;gap:8px;}
 .qsearch-item{
-  background:var(--surface2);border-radius:var(--rs);padding:10px 12px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:12px 14px;
 }
 .qsearch-q{font-size:13px;color:var(--text);line-height:1.4;margin-bottom:5px;}
 .qsearch-a{
@@ -514,4 +524,54 @@ mark.vocab-mark{
   .stats-grid{grid-template-columns:repeat(3,1fr)}
   .stat-num{font-size:22px}
   .nav-btn{padding:6px 8px;font-size:12px}
+}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;z-index:10000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  background:rgba(0,0,0,.45);
+  opacity:0;transition:opacity .15s;
+}
+.modal-overlay.show{opacity:1}
+.modal-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);box-shadow:var(--shadow);
+  padding:20px;width:100%;max-width:340px;
+  transform:translateY(6px);transition:transform .15s;
+}
+.modal-overlay.show .modal-box{transform:none}
+.modal-text{font-size:14px;line-height:1.55;color:var(--text);margin-bottom:18px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* TOAST */
+.toast{
+  position:fixed;left:50%;bottom:24px;z-index:10001;
+  transform:translate(-50%,12px);
+  background:var(--text);color:var(--bg);
+  padding:10px 18px;border-radius:20px;
+  font-size:13px;font-weight:600;text-align:center;
+  box-shadow:var(--shadow);max-width:80%;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* NARROW HEADER — the side panel is ~320-400px wide, so the topbar
+   must give up padding before nav items get clipped. The full-size
+   header needs ~490px, hence 520 rather than the 480 used elsewhere. */
+@media(max-width:520px){
+  .topbar{padding:0 6px}
+  .topbar-inner{padding:0 6px;gap:6px}
+  .nav{gap:2px}
+  .nav-btn{padding:6px 6px}
+  .logo svg{width:40px;height:24px}
+  .donate-icon{width:26px;height:26px;margin-left:0}
+}
+@media(max-width:370px){
+  .logo{display:none}
+}
+@media(max-width:340px){
+  .topbar-inner{padding:0 2px}
+  .nav-btn{padding:6px 4px}
 }

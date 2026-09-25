@@ -1,4 +1,75 @@
 (function(){
+// ─── DONATE ──────────────────────────────────────────
+// Replace with your Stripe Payment Link (Dashboard → Payment links → New).
+// Used by both the header button and the Info-tab card. Edit here only.
+const DONATE_URL = 'https://buy.stripe.com/aFa3cw28Vdbr4Pag4G1Nu00';
+
+function donateCard() {
+  const isEN = lang === 'en';
+  const title = isEN ? 'Support this project' : 'Поддержать проект';
+  const text = isEN
+    ? 'This app is free and open source, with no ads or tracking. If it helps you pass, a small one-time tip keeps it maintained and the questions up to date.'
+    : 'Приложение бесплатное и с открытым кодом — без рекламы и слежки. Если оно помогло вам сдать, небольшой разовый донат поможет поддерживать его и обновлять вопросы.';
+  const btn = isEN ? '☕ Buy me a coffee' : '☕ Угостить кофе';
+  return `<div class="info-card donate-card" style="margin-bottom:14px">
+    <div class="info-card-header" style="margin-bottom:10px;padding-bottom:10px">
+      <span class="info-icon">❤️</span>
+      <h2>${title}</h2>
+    </div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:12px">${text}</p>
+    <a class="donate-btn" href="${DONATE_URL}" target="_blank" rel="noopener noreferrer">${btn}</a>
+  </div>`;
+}
+
+// ─── DIALOGS ─────────────────────────────────────────
+// In-app replacements for confirm()/alert(), which Chrome may suppress
+// in the extension side panel.
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 250);
+  }, 2200);
+}
+
+function showConfirm(message, confirmLabel, onConfirm) {
+  const isEN = lang === 'en';
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true">
+    <p class="modal-text"></p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-mc="cancel">${isEN ? 'Cancel' : 'Отмена'}</button>
+      <button class="btn btn-danger" data-mc="ok">${confirmLabel}</button>
+    </div>
+  </div>`;
+  overlay.querySelector('.modal-text').textContent = message;
+
+  function close() {
+    document.removeEventListener('keydown', onKey);
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 200);
+  }
+  function onKey(e) {
+    if (e.key === 'Escape') close();
+    else if (e.key === 'Enter') { close(); onConfirm(); }
+  }
+
+  overlay.addEventListener('click', e => {
+    const hit = e.target.closest('[data-mc]');
+    if (hit && hit.dataset.mc === 'ok') { close(); onConfirm(); }
+    else if ((hit && hit.dataset.mc === 'cancel') || e.target === overlay) close();
+  });
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+  overlay.querySelector('[data-mc="ok"]').focus();
+}
+
 function renderVocab() {
   // Filters — use CAT_ORDER to control pill order
   const usedCats = CAT_ORDER.filter(c => ALL_VOCAB.some(v => v.cat === c));
@@ -200,16 +271,53 @@ function renderInfo() {
     ]
   );
 
+  const settingsCards = langCard + themeCard + donateCard();
   const html = INFO_HTML[lang];
   const secondCard = html.indexOf('<div class="info-card">', html.indexOf('<div class="info-card">') + 1);
-  const infoHtml = secondCard === -1 ? html + langCard + themeCard : html.slice(0, secondCard) + langCard + themeCard + html.slice(secondCard);
+  const infoHtml = secondCard === -1 ? html + settingsCards : html.slice(0, secondCard) + settingsCards + html.slice(secondCard);
   document.getElementById('info-content').innerHTML = infoHtml;
+}
+
+// ─── SEARCH ───────────────────────────────────────────
+function renderSearch() {
+  const q = document.getElementById('qsearch-input').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('qsearch-results');
+  if (q.length < 2) {
+    resultsEl.innerHTML = `<div class="qsearch-empty">${t('searchHint')}</div>`;
+    return;
+  }
+  const hits = QUESTIONS.filter(question => {
+    const text = (question.text + ' ' + question.responses.map(r => r.text).join(' ')).toLowerCase();
+    return text.includes(q);
+  }).slice(0, 15);
+  if (hits.length === 0) {
+    resultsEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div>${t('searchNoResults')}</div>`;
+    return;
+  }
+  resultsEl.innerHTML = hits.map(h => {
+    const correct = h.responses.find(r => r.correct);
+    return `<div class="qsearch-item">
+      <div class="qsearch-q">${esc(h.text)}</div>
+      <div class="qsearch-a">${esc(correct ? correct.text : '—')}</div>
+    </div>`;
+  }).join('');
 }
 
 // ─── LANG ─────────────────────────────────────────────
 function applyLang() {
   document.title = t('pageTitle');
   document.documentElement.lang = lang;
+  const ns = document.getElementById('nav-search');
+  if (ns) {
+    ns.title = t('navSearch');
+    ns.setAttribute('aria-label', t('navSearch'));
+  }
+  const dl = document.getElementById('donate-link');
+  if (dl) {
+    const label = lang === 'en' ? 'Support this project' : 'Поддержать проект';
+    dl.title = label;
+    dl.setAttribute('aria-label', label);
+  }
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
@@ -231,6 +339,10 @@ function navigate(view) {
   if (view === 'vocab') renderVocab();
   if (view === 'stats') renderStats();
   if (view === 'info') renderInfo();
+  if (view === 'search') {
+    renderSearch();
+    document.getElementById('qsearch-input').focus();
+  }
 }
 
 // ─── EVENTS ──────────────────────────────────────────
@@ -265,6 +377,7 @@ document.addEventListener('click', e => {
     renderQuestion();
     renderVocab();
     renderStats();
+    renderSearch();
     return;
   }
   if (action === 'toggleTheme') {
@@ -273,11 +386,11 @@ document.addEventListener('click', e => {
     return;
   }
   if (action === 'resetconfirm') {
-    if (confirm(t('statsResetConfirm'))) {
+    showConfirm(t('statsResetConfirm'), t('statsResetBtn'), () => {
       resetState();
       renderStats();
-      alert(lang === 'ru' ? 'Прогресс сброшен.' : 'Statistics reset.');
-    }
+      showToast(lang === 'ru' ? 'Прогресс сброшен.' : 'Statistics reset.');
+    });
     return;
   }
 });
@@ -290,6 +403,8 @@ document.getElementById('vocab-search').addEventListener('input', e => {
   vocabState.search = e.target.value.trim();
   renderVocab();
 });
+
+document.getElementById('qsearch-input').addEventListener('input', renderSearch);
 
 // ─── TOOLTIP ─────────────────────────────────────────
 const tt = document.getElementById('tt');
@@ -308,6 +423,8 @@ document.addEventListener('mouseout', e => {
 });
 
 // ─── INIT ─────────────────────────────────────────────
+const donateLink = document.getElementById('donate-link');
+if (donateLink) donateLink.href = DONATE_URL;
 loadTheme();
 loadState();
 applyLang();

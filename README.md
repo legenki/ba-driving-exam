@@ -16,6 +16,7 @@ A handy study app built for expats, digital nomads, and immigrants in Argentina 
 - **Alphabet** — Spanish alphabet with pronunciation notes and Argentine-specific quirks.
 - **Statistics** — weak topics, session history, overall accuracy. Progress saved in `localStorage`.
 - **Info** — step-by-step guide to getting a driving license in Buenos Aires, with Spanish terms explained.
+- **Search** — find any question by keyword and see its correct answer, in its own tab.
 - **EN / RU** — language toggle in the Info tab switches the entire UI between English and Russian.
 
 ## Project Structure
