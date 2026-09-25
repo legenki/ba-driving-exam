@@ -278,10 +278,40 @@ function renderInfo() {
   document.getElementById('info-content').innerHTML = infoHtml;
 }
 
+// ─── SEARCH ───────────────────────────────────────────
+function renderSearch() {
+  const q = document.getElementById('qsearch-input').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('qsearch-results');
+  if (q.length < 2) {
+    resultsEl.innerHTML = `<div class="qsearch-empty">${t('searchHint')}</div>`;
+    return;
+  }
+  const hits = QUESTIONS.filter(question => {
+    const text = (question.text + ' ' + question.responses.map(r => r.text).join(' ')).toLowerCase();
+    return text.includes(q);
+  }).slice(0, 15);
+  if (hits.length === 0) {
+    resultsEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div>${t('searchNoResults')}</div>`;
+    return;
+  }
+  resultsEl.innerHTML = hits.map(h => {
+    const correct = h.responses.find(r => r.correct);
+    return `<div class="qsearch-item">
+      <div class="qsearch-q">${esc(h.text)}</div>
+      <div class="qsearch-a">${esc(correct ? correct.text : '—')}</div>
+    </div>`;
+  }).join('');
+}
+
 // ─── LANG ─────────────────────────────────────────────
 function applyLang() {
   document.title = t('pageTitle');
   document.documentElement.lang = lang;
+  const ns = document.getElementById('nav-search');
+  if (ns) {
+    ns.title = t('navSearch');
+    ns.setAttribute('aria-label', t('navSearch'));
+  }
   const dl = document.getElementById('donate-link');
   if (dl) {
     const label = lang === 'en' ? 'Support this project' : 'Поддержать проект';
@@ -309,6 +339,10 @@ function navigate(view) {
   if (view === 'vocab') renderVocab();
   if (view === 'stats') renderStats();
   if (view === 'info') renderInfo();
+  if (view === 'search') {
+    renderSearch();
+    document.getElementById('qsearch-input').focus();
+  }
 }
 
 // ─── EVENTS ──────────────────────────────────────────
@@ -343,6 +377,7 @@ document.addEventListener('click', e => {
     renderQuestion();
     renderVocab();
     renderStats();
+    renderSearch();
     return;
   }
   if (action === 'toggleTheme') {
@@ -368,6 +403,8 @@ document.getElementById('vocab-search').addEventListener('input', e => {
   vocabState.search = e.target.value.trim();
   renderVocab();
 });
+
+document.getElementById('qsearch-input').addEventListener('input', renderSearch);
 
 // ─── TOOLTIP ─────────────────────────────────────────
 const tt = document.getElementById('tt');

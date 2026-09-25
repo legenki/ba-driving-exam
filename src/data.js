@@ -5,6 +5,10 @@ const I18N = {
     navVocab: 'Dictionary',
     navStats: 'Statistics',
     navInfo: 'Info',
+    navSearch: 'Search questions',
+    searchPlaceholder: 'Search questions by keyword...',
+    searchHint: 'Type at least 2 characters to find a question and its correct answer.',
+    searchNoResults: 'No results',
     langToggle: 'RU',
     pageTitle: 'BA Driving Exam',
     questionOf: (n, total) => `Question ${n} of ${total}`,
@@ -58,6 +62,10 @@ const I18N = {
     navVocab: 'Словарь',
     navStats: 'Статистика',
     navInfo: 'Инфо',
+    navSearch: 'Поиск по вопросам',
+    searchPlaceholder: 'Поиск вопроса по ключевому слову...',
+    searchHint: 'Введите хотя бы 2 символа, чтобы найти вопрос и правильный ответ.',
+    searchNoResults: 'Ничего не найдено',
     langToggle: 'EN',
     pageTitle: 'Экзамен ПДД — Буэнос-Айрес',
     questionOf: (n, total) => `Вопрос ${n} из ${total}`,
@@ -1004,16 +1012,6 @@ function renderQuestion() {
       </div>
     </div>
     ${glossHtml}
-    <div class="qsearch-card" id="qsearch-card">
-      <div class="qsearch-header">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        ${lang==='en' ? 'SEARCH QUESTIONS' : 'ПОИСК ПО ВОПРОСАМ'}
-      </div>
-      <input class="qsearch-input" id="qsearch-input" type="text"
-        placeholder="${lang==='en' ? 'Search by keyword...' : 'Поиск по ключевому слову...'}"
-        autocomplete="off" spellcheck="false">
-      <div class="qsearch-results" id="qsearch-results"></div>
-    </div>
   `;
 
   // Hide the question image if it fails to load (CSP-safe; replaces inline onerror)
@@ -1022,30 +1020,6 @@ function renderQuestion() {
     qImg.addEventListener('error', function() { this.style.display = 'none'; });
   }
 
-  // Attach search handler after DOM insert
-  const inp = document.getElementById('qsearch-input');
-  if (inp) {
-    inp.addEventListener('input', function() {
-      const q = this.value.trim().toLowerCase();
-      const resultsEl = document.getElementById('qsearch-results');
-      if (!q || q.length < 2) { resultsEl.innerHTML = ''; return; }
-      const hits = QUESTIONS.filter(question => {
-        const text = (question.text + ' ' + question.responses.map(r=>r.text).join(' ')).toLowerCase();
-        return text.includes(q);
-      }).slice(0, 15);
-      if (hits.length === 0) {
-        resultsEl.innerHTML = `<div class="qsearch-empty">${lang==='en' ? 'No results' : 'Ничего не найдено'}</div>`;
-        return;
-      }
-      resultsEl.innerHTML = hits.map(h => {
-        const correct = h.responses.find(r => r.correct);
-        return `<div class="qsearch-item">
-          <div class="qsearch-q">${esc(h.text)}</div>
-          <div class="qsearch-a">${esc(correct ? correct.text : '—')}</div>
-        </div>`;
-      }).join('');
-    });
-  }
 }
 
 // ─── WORD DICTIONARY (individual words) ─────────────────

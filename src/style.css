@@ -86,6 +86,7 @@ body{min-height:100vh;width:100%}
   color:var(--muted);transition:all .15s;
 }
 .nav-btn:hover{background:var(--surface3);color:var(--text)}
+.nav-icon{display:inline-flex;align-items:center;justify-content:center;padding:6px 9px}
 .nav-btn.active{background:var(--text);color:#fff}
 [data-theme="dark"] .nav-btn{color:var(--muted)}
 [data-theme="dark"] .nav-btn:hover{background:var(--surface2);color:var(--text)}
@@ -310,25 +311,10 @@ body{min-height:100vh;width:100%}
 .alphabet-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5}
 
 /* QUESTION SEARCH */
-.qsearch-card{
-  background:var(--surface);border-radius:var(--r);padding:12px 14px;
-  margin-top:10px;border:1px solid var(--border);
-}
-.qsearch-header{
-  display:flex;align-items:center;gap:6px;
-  font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);
-  margin-bottom:10px;
-}
-.qsearch-input{
-  width:100%;box-sizing:border-box;
-  padding:8px 12px;border-radius:8px;
-  border:1.5px solid var(--border);background:var(--bg);
-  font-size:14px;color:var(--text);outline:none;
-}
-.qsearch-input:focus{border-color:var(--accent);}
-.qsearch-results{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+.qsearch-results{display:flex;flex-direction:column;gap:8px;}
 .qsearch-item{
-  background:var(--surface2);border-radius:var(--rs);padding:10px 12px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:12px 14px;
 }
 .qsearch-q{font-size:13px;color:var(--text);line-height:1.4;margin-bottom:5px;}
 .qsearch-a{
@@ -572,8 +558,9 @@ mark.vocab-mark{
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* NARROW HEADER — the side panel is ~320-400px wide, so the topbar
-   must give up padding before nav items get clipped. */
-@media(max-width:480px){
+   must give up padding before nav items get clipped. The full-size
+   header needs ~490px, hence 520 rather than the 480 used elsewhere. */
+@media(max-width:520px){
   .topbar{padding:0 6px}
   .topbar-inner{padding:0 6px;gap:6px}
   .nav{gap:2px}
@@ -583,4 +570,8 @@ mark.vocab-mark{
 }
 @media(max-width:370px){
   .logo{display:none}
+}
+@media(max-width:340px){
+  .topbar-inner{padding:0 2px}
+  .nav-btn{padding:6px 4px}
 }
